@@ -15,7 +15,7 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = 1
-        versionName = "v1.0.0-beta.1" //app version - to be changed on each new APK iteration
+        versionName = "v1.0.0-beta.2" //app version - to be changed on each new APK iteration
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
