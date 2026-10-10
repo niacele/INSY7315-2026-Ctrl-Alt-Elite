@@ -47,9 +47,9 @@ class HomePageFragment : Fragment() {
         //app version
         val currentVersion = try {
             val pInfo = requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
-            pInfo.versionName ?: "v1.0.0-beta.1"
+            pInfo.versionName ?: "v1.0.0-beta.2"
         } catch (e: Exception) {
-            "v1.0.0-beta.1"
+            "v1.0.0-beta.2"
         }
 
         txtAppVersion.text = "Version $currentVersion"
