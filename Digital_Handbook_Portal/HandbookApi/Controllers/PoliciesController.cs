@@ -54,7 +54,7 @@ namespace HandbookApi.Controllers
                 return StatusCode(500, $"Internal error downloading file: {ex.Message}");
             }
         }
-
+        
         // GET: api/Policies
         [HttpGet]
         public async Task<ActionResult<ApiResponse<List<Policy>>>> GetPolicies()

@@ -1,4 +1,5 @@
 using Digital_Handbook_Portal.Models;
+using Digital_Handbook_Portal.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 

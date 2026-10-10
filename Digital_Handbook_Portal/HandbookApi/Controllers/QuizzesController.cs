@@ -1,4 +1,5 @@
 ﻿using Digital_Handbook_Portal.Models;
+using Digital_Handbook_Portal.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,18 +18,99 @@ namespace HandbookApi.Controllers
 
         // GET: api/Quizzes
         [HttpGet]
-        public async Task<IActionResult> GetQuizzes()
+        public async Task<ActionResult<ApiResponse<List<Quiz>>>> GetQuizzes()
         {
             var quizzes = await _context.Quiz
                 .Include(q => q.questions)
                     .ThenInclude(q => q.options)
                 .ToListAsync();
 
-            return Ok(new { data = quizzes });
+            return Ok(new ApiResponse<List<Quiz>> { Success = true, Data = quizzes });
+        }
+
+        // GET: api/Quizzes/results-summary
+        [HttpGet("results-summary")]
+        [Route("results-summary")]
+        public async Task<ActionResult<ApiResponse<List<UserCpdSummaryViewModel>>>> GetResultsSummary()
+        {
+            try
+            {
+                // 1. Fetch raw attempts first to prevent EF translation exceptions
+                var results = await _context.QuizResult
+                    .Include(q => q.Quiz)
+                    .Include(q => q.User)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                if (results == null || !results.Any())
+                {
+                    return Ok(new ApiResponse<List<UserCpdSummaryViewModel>>
+                    {
+                        Success = true,
+                        Data = new List<UserCpdSummaryViewModel>()
+                    });
+                }
+
+                // 2. Perform aggregation in-memory
+                var userSummaries = results
+                    .GroupBy(q => q.UserId)
+                    .Select(g =>
+                    {
+                        var firstUser = g.FirstOrDefault()?.User;
+                        string userIdStr = g.Key.ToString();
+                        string userEmail = !string.IsNullOrWhiteSpace(firstUser?.email)
+                            ? firstUser.email
+                            : $"User #{userIdStr}";
+
+                        string derivedName = userEmail.Contains("@")
+                            ? string.Join(" ", userEmail.Split('@')[0].Split('.', '_', '-').Select(s => s.Length > 0 ? char.ToUpper(s[0]) + s.Substring(1) : s))
+                            : "Staff Member";
+
+                        string displayName = !string.IsNullOrWhiteSpace(firstUser?.FullName)
+                            ? firstUser.FullName
+                            : derivedName;
+
+                        return new UserCpdSummaryViewModel
+                        {
+                            UserId = userIdStr,
+                            UserName = displayName,
+                            Email = userEmail,
+                            TotalCpdPoints = g.Sum(q => q.CpdPointsAwarded),
+                            TotalQuizzesAttempted = g.Count(),
+                            TotalQuizzesPassed = g.Count(q => q.IsPassed)
+                        };
+                    })
+                    .OrderByDescending(u => u.TotalCpdPoints)
+                    .ToList();
+
+                return Ok(new ApiResponse<List<UserCpdSummaryViewModel>> { Success = true, Data = userSummaries });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<List<UserCpdSummaryViewModel>>
+                {
+                    Success = false,
+                    Message = $"Error retrieving CPD summaries: {ex.Message}"
+                });
+            }
+        }
+
+        // GET: api/Quizzes/user-details/1
+        [HttpGet("user-details/{userId:int}", Order = -1)]
+        public async Task<ActionResult<ApiResponse<List<QuizResult>>>> GetUserQuizHistory(int userId)
+        {
+            var attempts = await _context.QuizResult
+                .Include(q => q.Quiz)
+                .Include(q => q.User)
+                .Where(q => q.UserId == userId)
+                .OrderByDescending(q => q.CompletedAt)
+                .ToListAsync();
+
+            return Ok(new ApiResponse<List<QuizResult>> { Success = true, Data = attempts });
         }
 
         // GET: api/Quizzes/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<ApiResponse<Quiz>>> GetQuiz(int id)
         {
             var quiz = await _context.Quiz
@@ -66,7 +148,7 @@ namespace HandbookApi.Controllers
         }
 
         // PUT: api/Quizzes/5
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<ActionResult<ApiResponse<Quiz>>> UpdateQuiz(int id, [FromBody] Quiz quiz)
         {
             if (id != quiz.quizId)
@@ -84,13 +166,11 @@ namespace HandbookApi.Controllers
                 return NotFound(new ApiResponse<Quiz> { Success = false, Message = "Quiz not found." });
             }
 
-            // Update parent properties
             existingQuiz.title = quiz.title;
             existingQuiz.score = quiz.score;
             existingQuiz.passingScore = quiz.passingScore;
             existingQuiz.estimateTime = quiz.estimateTime;
 
-            // Remove previous questions/options to sync modified graph
             _context.Set<QuizQuestion>().RemoveRange(existingQuiz.questions);
 
             if (quiz.questions != null)
@@ -116,7 +196,7 @@ namespace HandbookApi.Controllers
         }
 
         // DELETE: api/Quizzes/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult<ApiResponse<bool>>> DeleteQuiz(int id)
         {
             var quiz = await _context.Quiz
@@ -135,7 +215,6 @@ namespace HandbookApi.Controllers
             return Ok(new ApiResponse<bool> { Success = true, Message = "Quiz deleted successfully.", Data = true });
         }
 
-        //quiz submission endpoint 'stuff'
         public class QuizSubmissionRequest
         {
             public int QuizId { get; set; }
@@ -146,6 +225,7 @@ namespace HandbookApi.Controllers
             public int? UserId { get; set; }
         }
 
+        // POST: api/Quizzes/submit
         [HttpPost("submit")]
         public async Task<ActionResult<ApiResponse<object>>> SubmitQuizResult([FromBody] QuizSubmissionRequest submission)
         {
