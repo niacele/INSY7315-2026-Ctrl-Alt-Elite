@@ -144,7 +144,7 @@
         android:id="@+id/resourcesBackFragment"
         android:name="com.example.employeedigitalhandbook.features.ResourcesBackFragment"
         android:label="Resource Detail"
-        tools:layout="@layout/fragment_resources_back">
+        tools:layout="@layout/fragment_resources_back_website">
 
         <argument
             android:name="RESOURCE_ID"
