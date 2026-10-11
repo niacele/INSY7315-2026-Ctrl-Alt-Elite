@@ -103,10 +103,11 @@ class MainActivity : AppCompatActivity() {
 
         setupDrawerMenu()
 
-        window.setFlags(
-            WindowManager.LayoutParams.FLAG_SECURE,
-            WindowManager.LayoutParams.FLAG_SECURE
-        )
+        //commented out TEMPORARILY for testing purposes
+//        window.setFlags(
+//            WindowManager.LayoutParams.FLAG_SECURE,
+//            WindowManager.LayoutParams.FLAG_SECURE
+//        )
     }
 
     override fun onStart() {
