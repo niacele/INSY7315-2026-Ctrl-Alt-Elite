@@ -8,23 +8,29 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.employeedigitalhandbook.api.ApiClient
+import com.example.employeedigitalhandbook.data.Resource
+import com.example.employeedigitalhandbook.databinding.FragmentResourcesBackPdfBinding
 import com.example.employeedigitalhandbook.databinding.FragmentResourcesBackWebsiteBinding
 import kotlinx.coroutines.launch
+import java.net.URLEncoder
 
 class ResourcesBackFragment : Fragment() {
 
-    private var _binding: FragmentResourcesBackWebsiteBinding? = null
-    private val binding get() = _binding!!
+    private var pdfBinding: FragmentResourcesBackPdfBinding? = null
+    private var websiteBinding: FragmentResourcesBackWebsiteBinding? = null
 
     private var resourceId: Int = -1
+    private var isPdfMode: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         resourceId = arguments?.getInt("RESOURCE_ID", -1) ?: -1
+        isPdfMode = arguments?.getBoolean("IS_PDF_MODE", false) ?: false
     }
 
     override fun onCreateView(
@@ -32,15 +38,23 @@ class ResourcesBackFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentResourcesBackWebsiteBinding.inflate(inflater, container, false)
-        return binding.root
+        return if (isPdfMode) {
+            pdfBinding = FragmentResourcesBackPdfBinding.inflate(inflater, container, false)
+            pdfBinding!!.root
+        } else {
+            websiteBinding = FragmentResourcesBackWebsiteBinding.inflate(inflater, container, false)
+            websiteBinding!!.root
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupWebView()
         setupControls()
+
+        if (!isPdfMode) {
+            setupWebView()
+        }
 
         if (resourceId != -1) {
             fetchAndLoadResource(resourceId)
@@ -50,7 +64,7 @@ class ResourcesBackFragment : Fragment() {
     }
 
     private fun setupWebView() {
-        binding.resourceWebView.apply {
+        websiteBinding?.resourceWebView?.apply {
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.builtInZoomControls = true
@@ -59,46 +73,41 @@ class ResourcesBackFragment : Fragment() {
             webViewClient = object : WebViewClient() {
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
-                    _binding?.resourceProgressBar?.visibility = View.GONE
+                    websiteBinding?.resourceProgressBar?.isVisible = false
                 }
             }
 
             webChromeClient = object : WebChromeClient() {
                 override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                    if (newProgress < 100) {
-                        _binding?.resourceProgressBar?.visibility = View.VISIBLE
-                    } else {
-                        _binding?.resourceProgressBar?.visibility = View.GONE
-                    }
+                    websiteBinding?.resourceProgressBar?.isVisible = newProgress < 100
                 }
             }
         }
     }
 
     private fun setupControls() {
-        binding.backArrowImageView.setOnClickListener {
-            findNavController().navigateUp()
-        }
-
-        binding.previousPageIcon.setOnClickListener {
-            if (binding.resourceWebView.canGoBack()) {
-                binding.resourceWebView.goBack()
+        if (isPdfMode) {
+            pdfBinding?.apply {
+                backArrowImageView.setOnClickListener { findNavController().navigateUp() }
             }
-        }
-
-        binding.nextPageIcon.setOnClickListener {
-            if (binding.resourceWebView.canGoForward()) {
-                binding.resourceWebView.goForward()
+        } else {
+            websiteBinding?.apply {
+                backArrowImageView.setOnClickListener { findNavController().navigateUp() }
+                previousPageIcon.setOnClickListener {
+                    if (resourceWebView.canGoBack()) resourceWebView.goBack()
+                }
+                nextPageIcon.setOnClickListener {
+                    if (resourceWebView.canGoForward()) resourceWebView.goForward()
+                }
+                searchDocIcon.setOnClickListener {
+                    resourceWebView.showFindDialog(null, true)
+                }
             }
-        }
-
-        binding.searchDocIcon.setOnClickListener {
-            binding.resourceWebView.showFindDialog(null, true)
         }
     }
 
     private fun fetchAndLoadResource(id: Int) {
-        binding.resourceProgressBar.visibility = View.VISIBLE
+        setLoadingState(true)
 
         lifecycleScope.launch {
             try {
@@ -108,55 +117,63 @@ class ResourcesBackFragment : Fragment() {
                     val apiResponse = response.body()!!
 
                     if (apiResponse.success && apiResponse.data != null) {
-                        val resource = apiResponse.data //unpack data
+                        val resource: Resource = apiResponse.data
+                        val targetUrl = resource.resourceUrl ?: ""
 
-                        _binding?.let { b ->
-                            b.pageTitleTextView.text = resource.title
-                            b.breadcrumbTextView.text = resource.breadcrumbPath
-                                ?: "../${resource.category}/${resource.title}"
+                        if (isPdfMode) {
+                            pdfBinding?.apply {
+                                pageTitleTextView.text = resource.title
+                                breadcrumbTextView.text = resource.breadcrumbPath
+                                    ?: "../${resource.category}/${resource.title}"
 
-                            val targetUrl = resource.resourceUrl
+                                resourceProgressBar.isVisible = false
+                            }
+                        } else {
+                            websiteBinding?.apply {
+                                pageTitleTextView.text = resource.title
+                                breadcrumbTextView.text = resource.breadcrumbPath
+                                    ?: "../${resource.category}/${resource.title}"
 
-                            if (!targetUrl.isNullOrEmpty()) {
-                                val urlToLoad = if (targetUrl.endsWith(".pdf", ignoreCase = true) || targetUrl.contains(".pdf?")) {
-                                    val encodedUrl = java.net.URLEncoder.encode(targetUrl, "UTF-8")
-                                    "https://docs.google.com/gview?embedded=true&url=$encodedUrl"
+                                if (targetUrl.isNotEmpty()) {
+                                    val urlToLoad = if (targetUrl.endsWith(".pdf", ignoreCase = true) || targetUrl.contains(".pdf?")) {
+                                        val encodedUrl = URLEncoder.encode(targetUrl, "UTF-8")
+                                        "https://docs.google.com/gview?embedded=true&url=$encodedUrl"
+                                    } else {
+                                        targetUrl
+                                    }
+                                    resourceWebView.loadUrl(urlToLoad)
                                 } else {
-                                    targetUrl
-                                }
-
-                                b.resourceProgressBar.visibility = View.GONE
-                                b.resourceWebView.loadUrl(urlToLoad)
-                            } else {
-                                b.resourceProgressBar.visibility = View.GONE
-                                context?.let { ctx ->
-                                    Toast.makeText(ctx, "No URL configured", Toast.LENGTH_SHORT).show()
+                                    resourceProgressBar.isVisible = false
+                                    Toast.makeText(requireContext(), "No URL configured", Toast.LENGTH_SHORT).show()
                                 }
                             }
                         }
                     } else {
-                        _binding?.let { b -> b.resourceProgressBar.visibility = View.GONE }
-                        context?.let { ctx ->
-                            Toast.makeText(ctx, apiResponse.message ?: "Failed to load details", Toast.LENGTH_SHORT).show()
-                        }
+                        setLoadingState(false)
+                        Toast.makeText(requireContext(), apiResponse.message ?: "Failed to load resource", Toast.LENGTH_SHORT).show()
                     }
                 } else {
-                    _binding?.let { b -> b.resourceProgressBar.visibility = View.GONE }
-                    context?.let { ctx ->
-                        Toast.makeText(ctx, "Failed to load details", Toast.LENGTH_SHORT).show()
-                    }
+                    setLoadingState(false)
+                    Toast.makeText(requireContext(), "Failed to load resource", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                _binding?.let { b -> b.resourceProgressBar.visibility = View.GONE }
-                context?.let { ctx ->
-                    Toast.makeText(ctx, "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
-                }
+                setLoadingState(false)
+                Toast.makeText(requireContext(), "Error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun setLoadingState(isLoading: Boolean) {
+        if (isPdfMode) {
+            pdfBinding?.resourceProgressBar?.isVisible = isLoading
+        } else {
+            websiteBinding?.resourceProgressBar?.isVisible = isLoading
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        pdfBinding = null
+        websiteBinding = null
     }
 }
