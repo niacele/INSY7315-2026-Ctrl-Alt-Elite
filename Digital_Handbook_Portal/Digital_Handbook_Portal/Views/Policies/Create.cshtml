@@ -52,13 +52,32 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label fw-semibold">Document File / URL</label>
+                            <label class="form-label fw-semibold d-block">Document Source</label>
 
-                            <input type="file" name="pdfFile" class="form-control mb-2" accept=".pdf,.doc,.docx" />
+                            <div class="btn-group w-100 mb-3" role="group" aria-label="Resource Source Selector">
+                                <input type="radio" class="btn-check" name="resourceTypeToggle" id="typePdf" value="pdf" checked autocomplete="off">
+                                <label class="btn btn-outline-primary" for="typePdf">
+                                    <i class="bi bi-file-earmark-pdf me-1"></i> Upload PDF Document
+                                </label>
 
-                            <input asp-for="fileUrl" class="form-control" placeholder="Or enter URL: https://... or /policies/file.pdf" />
+                                <input type="radio" class="btn-check" name="resourceTypeToggle" id="typeWeb" value="web" autocomplete="off">
+                                <label class="btn btn-outline-primary" for="typeWeb">
+                                    <i class="bi bi-globe me-1"></i> External Website / Link
+                                </label>
+                            </div>
 
-                            <span asp-validation-for="fileUrl" class="text-danger small"></span>
+                            <div id="pdfUploadContainer">
+                                <label class="form-label text-muted small">Choose PDF File</label>
+                                <input type="file" id="pdfFileInput" name="pdfFile" class="form-control" accept=".pdf" />
+                                <div class="form-text">Upload a document directly into hospital cloud storage.</div>
+                            </div>
+
+                            <div id="webLinkContainer" class="d-none">
+                                <label class="form-label text-muted small">Website URL</label>
+                                <input asp-for="fileUrl" id="webUrlInput" class="form-control" placeholder="https://www.example.com/guidelines" />
+                                <div class="form-text">Enter a direct website address or external portal link.</div>
+                                <span asp-validation-for="fileUrl" class="text-danger small"></span>
+                            </div>
                         </div>
 
                         <div class="d-flex gap-2">

@@ -10,25 +10,38 @@
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/doctorDetailsScrollView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:fillViewport="true"
-        android:overScrollMode="never"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:overScrollMode="never">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="48dp">
 
+            <!-- Back Button -->
+            <ImageButton
+                android:id="@+id/btnBack"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="12dp"
+                android:src="@android:drawable/ic_media_previous"
+                app:layout_constraintBottom_toBottomOf="@id/detailsLogoImageView"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/detailsLogoImageView"
+                app:tint="@color/white" />
+
+            <!-- Top Header Logo -->
             <ImageView
                 android:id="@+id/detailsLogoImageView"
-                android:layout_width="260dp"
-                android:layout_height="80dp"
-                android:layout_marginTop="8dp"
+                android:layout_width="220dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="40dp"
                 android:adjustViewBounds="true"
                 android:src="@drawable/peh_landscape_logo_in_white"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -36,35 +49,23 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="ContentDescription" />
 
-            <ImageButton
-                android:id="@+id/btnBack"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_marginStart="24dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:clickable="true"
-                android:focusable="true"
-                android:src="@android:drawable/ic_media_previous"
-                app:layout_constraintBottom_toBottomOf="@id/detailsLogoImageView"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/detailsLogoImageView"
-                app:tint="@color/white" />
-
+            <!-- White Sheet Background (Fluid width and wraps doctor info) -->
             <View
                 android:id="@+id/whiteSheetBackground"
-                android:layout_width="411dp"
-                android:layout_height="488dp"
-                android:layout_marginTop="12dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="20dp"
                 android:background="@drawable/bg_white_rounded_top"
-                app:layout_constraintBottom_toTopOf="@id/greySheetBackground"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/detailsLogoImageView" />
 
+            <!-- Doctor Avatar Image -->
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imgDoctorProfile"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
                 android:layout_marginTop="28dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/placeholder_doctor"
@@ -72,20 +73,22 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/whiteSheetBackground" />
 
+            <!-- Doctor Name -->
             <TextView
                 android:id="@+id/txtDoctorName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:fontFamily="@font/raleway"
+                android:fontFamily="@font/raleway_bold"
                 android:text="Dr Name"
                 android:textColor="@color/black"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/imgDoctorProfile" />
 
+            <!-- Specialty -->
             <TextView
                 android:id="@+id/txtDoctorSpecialty"
                 android:layout_width="wrap_content"
@@ -94,11 +97,12 @@
                 android:fontFamily="@font/raleway"
                 android:text="Speciality"
                 android:textColor="#718096"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/txtDoctorName" />
 
+            <!-- Suite -->
             <TextView
                 android:id="@+id/txtDoctorSuite"
                 android:layout_width="wrap_content"
@@ -113,11 +117,12 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/txtDoctorSpecialty" />
 
+            <!-- Contact Information -->
             <LinearLayout
                 android:id="@+id/contactInfoDisplayContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="14dp"
                 android:gravity="center"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -131,27 +136,29 @@
                     android:fontFamily="@font/raleway_bold"
                     android:text="000 000 0000"
                     android:textColor="#2D3748"
-                    android:textSize="16sp"
+                    android:textSize="15sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/txtDoctorEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="2dp"
                     android:fontFamily="@font/raleway"
                     android:text="doctor@pmbeyehospital.co.za"
                     android:textColor="#2690CF"
-                    android:textSize="15sp" />
+                    android:textSize="14sp" />
             </LinearLayout>
 
+            <!-- Call & Email Action Buttons -->
             <LinearLayout
                 android:id="@+id/actionButtonsContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:orientation="horizontal"
-                android:paddingHorizontal="32dp"
+                android:paddingHorizontal="28dp"
+                android:paddingBottom="24dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/contactInfoDisplayContainer">
@@ -159,33 +166,38 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCallDoctor"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:backgroundTint="#81C241"
+                    android:fontFamily="@font/raleway_bold"
                     android:text="Call Now"
+                    android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     app:cornerRadius="12dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEmailDoctor"
                     android:layout_width="0dp"
-                    android:layout_height="52dp"
+                    android:layout_height="48dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:backgroundTint="#2690CF"
+                    android:fontFamily="@font/raleway_bold"
                     android:text="Send Email"
+                    android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     app:cornerRadius="12dp" />
             </LinearLayout>
 
+            <!-- Grey Sheet Background -->
             <View
                 android:id="@+id/greySheetBackground"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="-12dp"
                 android:background="@drawable/bg_grey_rounded_top"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -203,19 +215,18 @@
                 android:fontFamily="@font/raleway_bold"
                 android:text="Policies"
                 android:textColor="@color/black"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/greySheetBackground" />
-
 
             <!-- Dynamic Policies RecyclerView -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/doctorPoliciesRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"
                 android:paddingHorizontal="20dp"
@@ -230,6 +241,5 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

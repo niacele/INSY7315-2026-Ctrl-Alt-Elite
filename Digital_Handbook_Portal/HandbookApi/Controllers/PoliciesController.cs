@@ -23,23 +23,36 @@ namespace HandbookApi.Controllers
         [HttpGet("{id:int}/file")]
         public async Task<IActionResult> DownloadPolicyFile(int id)
         {
-            var policy = await _context.Policy.FindAsync(id); // Fixed: _context.Policy
-            if (policy == null || string.IsNullOrEmpty(policy.fileUrl)) // Also ensure property name matches (fileUrl vs pdfUrl)
+            var policy = await _context.Policy.FindAsync(id);
+            if (policy == null || string.IsNullOrWhiteSpace(policy.fileUrl))
             {
                 return NotFound("Policy or document not found.");
             }
 
-            //initialize storage client
-            var storage = StorageClient.Create();
-            var memoryStream = new MemoryStream();
+            try
+            {
+                //initialize storage client
+                var storage = StorageClient.Create();
+                var memoryStream = new MemoryStream();
 
-            //extract object name
-            string objectName = Path.GetFileName(new Uri(policy.fileUrl).LocalPath);
+                //extract relative object path - policies stored in digihandbook-bucket which is in the filepath so we need to remove it from the object name
+                var uri = new Uri(policy.fileUrl);
+                string objectName = uri.AbsolutePath.TrimStart('/')
+                                       .Replace("digihandbook-bucket/", "");
 
-            await storage.DownloadObjectAsync("digihandbook-bucket", objectName, memoryStream);
-            memoryStream.Position = 0;
+                await storage.DownloadObjectAsync("digihandbook-bucket", objectName, memoryStream);
+                memoryStream.Position = 0;
 
-            return File(memoryStream, "application/pdf");
+                return File(memoryStream, "application/pdf", Path.GetFileName(objectName));
+            }
+            catch (Google.GoogleApiException ex) when (ex.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return NotFound($"Document object was not found in storage bucket: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal error downloading file: {ex.Message}");
+            }
         }
         
         // GET: api/Policies

@@ -8,6 +8,7 @@ import com.example.employeedigitalhandbook.data.Quiz
 import com.example.employeedigitalhandbook.data.QuizSubmission
 import com.example.employeedigitalhandbook.data.Resource
 import com.example.employeedigitalhandbook.api.ApiResponse
+import com.example.employeedigitalhandbook.sessions.UserSessionPayload
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -31,6 +32,9 @@ interface ApiService {
     suspend fun downloadFile(@Url fileUrl: String): Response<ResponseBody>
     @POST("api/Auth/login")
     suspend fun login(@Body request: ApiLoginRequest): Response<ApiLoginResponse>
+
+    @POST("api/Users/sessions/log")
+    suspend fun logUserSession(@Body payload: UserSessionPayload): Response<ResponseBody>
 
     // --- COMMUNITY EVENTS ---
 //    @GET("api/CommunityEvents")

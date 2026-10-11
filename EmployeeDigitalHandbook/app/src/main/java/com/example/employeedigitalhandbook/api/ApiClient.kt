@@ -69,4 +69,12 @@ object ApiClient {
             .build()
             .create(ApiService::class.java)
     }
+
+    fun clearCache() {
+        try {
+            okHttpClient.cache?.evictAll()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

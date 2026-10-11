@@ -222,24 +222,17 @@ class PoliciesBackFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
-                //get metadata from endpoint
                 val response = ApiClient.apiService.getPolicyById(id)
                 val body = response.body()
 
                 if (response.isSuccessful && body != null && body.data != null) {
                     val policy = body.data
 
-                    //populate fields
                     binding.pageTitleTextView.text = policy.category
                     binding.breadcrumbTextView.text = policy.breadcrumbPath
 
-                    val rawPdfUrl = policy.pdfUrl
-                    if (!rawPdfUrl.isNullOrEmpty()) {
-                        downloadAndRenderPdf(rawPdfUrl)
-                    } else {
-                        binding.pdfProgressBar.visibility = View.GONE
-                        Toast.makeText(requireContext(), "No PDF document attached", Toast.LENGTH_SHORT).show()
-                    }
+                    // Download securely via API
+                    downloadAndRenderPdf()
                 } else {
                     binding.pdfProgressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), "Failed to fetch policy details", Toast.LENGTH_SHORT).show()
@@ -251,15 +244,17 @@ class PoliciesBackFragment : Fragment() {
         }
     }
 
-    private suspend fun downloadAndRenderPdf(url: String) {
+    private suspend fun downloadAndRenderPdf() {
         try {
             val localFile = withContext(Dispatchers.IO) {
-                //download binary
-                val downloadResponse = ApiClient.apiService.downloadFile("api/policies/$id/file")
+                // Stream the PDF through your secure Cloud Run API endpoint
+                val downloadResponse = ApiClient.apiService.downloadFile("api/policies/$policyId/file")
+
                 if (!downloadResponse.isSuccessful || downloadResponse.body() == null) {
                     throw Exception("HTTP ${downloadResponse.code()}: ${downloadResponse.message()}")
                 }
 
+                // Save binary stream into private app cache
                 val cacheFile = File(requireContext().cacheDir, "current_policy.pdf")
                 downloadResponse.body()!!.byteStream().use { input ->
                     FileOutputStream(cacheFile).use { output ->
@@ -269,7 +264,7 @@ class PoliciesBackFragment : Fragment() {
                 cacheFile
             }
 
-            //initialize renderer on frontend
+            // Initialize Android's native PdfRenderer
             fileDescriptor = ParcelFileDescriptor.open(localFile, ParcelFileDescriptor.MODE_READ_ONLY)
             pdfRenderer = PdfRenderer(fileDescriptor!!)
             binding.pdfProgressBar.visibility = View.GONE
