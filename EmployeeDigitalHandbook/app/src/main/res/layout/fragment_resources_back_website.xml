@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#8BC34A"
-    tools:context=".features.ResourcesBackFragment">
+    tools:context=".features.ResourcesBackWebsiteFragment">
 
     <!-- Top White Rounded Sheet Container -->
     <androidx.constraintlayout.widget.ConstraintLayout

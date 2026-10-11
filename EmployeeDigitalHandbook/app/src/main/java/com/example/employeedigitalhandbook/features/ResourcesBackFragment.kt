@@ -12,12 +12,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.employeedigitalhandbook.api.ApiClient
-import com.example.employeedigitalhandbook.databinding.FragmentResourcesBackBinding
+import com.example.employeedigitalhandbook.databinding.FragmentResourcesBackWebsiteBinding
 import kotlinx.coroutines.launch
 
 class ResourcesBackFragment : Fragment() {
 
-    private var _binding: FragmentResourcesBackBinding? = null
+    private var _binding: FragmentResourcesBackWebsiteBinding? = null
     private val binding get() = _binding!!
 
     private var resourceId: Int = -1
@@ -32,7 +32,7 @@ class ResourcesBackFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentResourcesBackBinding.inflate(inflater, container, false)
+        _binding = FragmentResourcesBackWebsiteBinding.inflate(inflater, container, false)
         return binding.root
     }
 
