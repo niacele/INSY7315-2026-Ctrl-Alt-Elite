@@ -12,9 +12,9 @@
         android:label="Login"
         tools:layout="@layout/fragment_login">
 
-        <action
-            android:id="@+id/action_loginFragment_to_resetPasswordFragment"
-            app:destination="@id/ResetPasswordFragment"/>
+<!--        <action-->
+<!--            android:id="@+id/action_loginFragment_to_resetPasswordFragment"-->
+<!--            app:destination="@id/ResetPasswordFragment"/>-->
 
         <action
             android:id="@+id/action_loginFragment_to_homePageFragment"
