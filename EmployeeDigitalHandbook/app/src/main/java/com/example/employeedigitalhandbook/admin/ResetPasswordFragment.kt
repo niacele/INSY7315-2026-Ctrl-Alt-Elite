@@ -1,60 +1,138 @@
 package com.example.employeedigitalhandbook.admin
 
+import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.employeedigitalhandbook.R
+import android.widget.Toast
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.example.employeedigitalhandbook.api.ApiClient
+import com.example.employeedigitalhandbook.data.ChangePasswordRequest
+import com.example.employeedigitalhandbook.databinding.FragmentResetPasswordBinding
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ResetPasswordFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ResetPasswordFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private var _binding: FragmentResetPasswordBinding? = null
+    private val binding get() = _binding!!
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentResetPasswordBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.backArrowImageView.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        binding.savePasswordButton.setOnClickListener {
+            attemptPasswordChange()
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_reset_password, container, false)
+    private fun attemptPasswordChange() {
+        val currentPassword = binding.currentPasswordEditText.text.toString().trim()
+        val newPassword = binding.newPasswordEditText.text.toString().trim()
+        val confirmPassword = binding.confirmPasswordEditText.text.toString().trim()
+
+        // 1. Clear previous errors
+        binding.currentPasswordInputLayout.error = null
+        binding.newPasswordInputLayout.error = null
+        binding.confirmPasswordInputLayout.error = null
+
+        // 2. Validate inputs
+        if (currentPassword.isEmpty()) {
+            binding.currentPasswordInputLayout.error = "Current password is required"
+            return
+        }
+
+        if (newPassword.isEmpty() || newPassword.length < 6) {
+            binding.newPasswordInputLayout.error = "New password must be at least 6 characters long"
+            return
+        }
+
+        if (newPassword == currentPassword) {
+            binding.newPasswordInputLayout.error = "New password cannot be identical to current password"
+            return
+        }
+
+        if (newPassword != confirmPassword) {
+            binding.confirmPasswordInputLayout.error = "Passwords do not match"
+            return
+        }
+
+        // 3. Get Active User ID
+        val activeUserId = getLoggedUserId()
+        if (activeUserId == -1) {
+            Toast.makeText(requireContext(), "User session expired. Please log in again.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 4. Send API request
+        setLoadingState(true)
+
+        lifecycleScope.launch {
+            try {
+                val request = ChangePasswordRequest(
+                    userId = activeUserId,
+                    currentPassword = currentPassword,
+                    newPassword = newPassword
+                )
+
+                val response = ApiClient.apiService.changePassword(request)
+                setLoadingState(false)
+
+                if (response.isSuccessful && response.body() != null) {
+                    val apiResponse = response.body()!!
+
+                    if (apiResponse.success) {
+                        Toast.makeText(
+                            requireContext(),
+                            apiResponse.message ?: "Password updated successfully!",
+                            Toast.LENGTH_LONG
+                        ).show()
+                        findNavController().navigateUp()
+                    } else {
+                        val errorMsg = apiResponse.message ?: "Failed to update password."
+                        Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_LONG).show()
+                    }
+                } else {
+                    val errorMsg = response.errorBody()?.string() ?: "Error: ${response.code()}"
+                    Toast.makeText(requireContext(), "Failed: $errorMsg", Toast.LENGTH_LONG).show()
+                }
+            } catch (e: Exception) {
+                setLoadingState(false)
+                Toast.makeText(requireContext(), "Network error: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ResetPasswordFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ResetPasswordFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    private fun setLoadingState(isLoading: Boolean) {
+        binding.resetProgressBar.isVisible = isLoading
+        binding.savePasswordButton.isEnabled = !isLoading
+        binding.currentPasswordEditText.isEnabled = !isLoading
+        binding.newPasswordEditText.isEnabled = !isLoading
+        binding.confirmPasswordEditText.isEnabled = !isLoading
+    }
+
+    private fun getLoggedUserId(): Int {
+        val sharedPref = requireActivity().getSharedPreferences("UserSession", Context.MODE_PRIVATE)
+        return sharedPref.getInt("USER_ID", -1)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
