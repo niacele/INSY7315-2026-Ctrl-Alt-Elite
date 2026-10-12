@@ -8,6 +8,7 @@ import com.example.employeedigitalhandbook.data.Quiz
 import com.example.employeedigitalhandbook.data.QuizSubmission
 import com.example.employeedigitalhandbook.data.Resource
 import com.example.employeedigitalhandbook.api.ApiResponse
+import com.example.employeedigitalhandbook.data.ChangePasswordRequest
 import com.example.employeedigitalhandbook.sessions.UserSessionPayload
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -87,4 +88,9 @@ interface ApiService {
 
     @GET("api/policies/{id}")
     suspend fun getPolicyById(@Path("id") id: Int): Response<ApiResponse<Policy>>
+
+
+    // --- Change Password ---
+    @POST("api/Users/change-password")
+    suspend fun changePassword(@Body request: ChangePasswordRequest): Response<ApiResponse<Boolean>>
 }
