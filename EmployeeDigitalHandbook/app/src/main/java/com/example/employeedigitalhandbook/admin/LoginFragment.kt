@@ -49,9 +49,9 @@ class LoginFragment : Fragment() {
             viewModel.login(email, password)
         }
 
-        forgotPasswordTextView.setOnClickListener {
-            findNavController().navigate(R.id.action_loginFragment_to_resetPasswordFragment)
-        }
+//        forgotPasswordTextView.setOnClickListener {
+//            findNavController().navigate(R.id.action_loginFragment_to_resetPasswordFragment)
+//        }
 
         viewModel.loginState.observe(viewLifecycleOwner) { result ->
             loginButton.isEnabled = true
