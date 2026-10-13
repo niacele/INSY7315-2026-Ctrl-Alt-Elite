@@ -39,7 +39,7 @@ class LoginFragment : Fragment() {
         val emailEditText = view.findViewById<TextInputEditText>(R.id.emailEditText)
         val passwordEditText = view.findViewById<TextInputEditText>(R.id.passwordEditText)
         val loginButton = view.findViewById<MaterialButton>(R.id.loginButton)
-        val forgotPasswordTextView = view.findViewById<TextView>(R.id.forgotPasswordTextView)
+        //val forgotPasswordTextView = view.findViewById<TextView>(R.id.forgotPasswordTextView)
 
         loginButton.setOnClickListener {
             val email = emailEditText.text?.toString().orEmpty()

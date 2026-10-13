@@ -204,36 +204,65 @@ namespace HandbookApi.Controllers
         [HttpPost("change-password")]
         public async Task<ActionResult<ApiResponse<bool>>> ChangePassword([FromBody] ChangePasswordRequest request)
         {
-            if (!ModelState.IsValid || request == null)
+            if (request == null || !ModelState.IsValid)
             {
-                return BadRequest(new ApiResponse<bool> { Success = false, Message = "Invalid request payload.", Data = false });
+                return BadRequest(new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Invalid request payload.",
+                    Data = false
+                });
             }
 
             if (string.IsNullOrWhiteSpace(request.NewPassword) || request.NewPassword.Length < 6)
             {
-                return BadRequest(new ApiResponse<bool> { Success = false, Message = "New password must be at least 6 characters long.", Data = false });
+                return BadRequest(new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "New password must be at least 6 characters long.",
+                    Data = false
+                });
+            }
+
+            if (request.CurrentPassword == request.NewPassword)
+            {
+                return BadRequest(new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "New password cannot be identical to current password.",
+                    Data = false
+                });
             }
 
             var user = await _context.User.FindAsync(request.UserId);
             if (user == null)
             {
-                return NotFound(new ApiResponse<bool> { Success = false, Message = "User not found.", Data = false });
+                return NotFound(new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "User not found.",
+                    Data = false
+                });
             }
 
             bool isCurrentPasswordValid = BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.password);
             if (!isCurrentPasswordValid)
             {
-                return BadRequest(new ApiResponse<bool> { Success = false, Message = "Current password provided is incorrect.", Data = false });
+                return BadRequest(new ApiResponse<bool>
+                {
+                    Success = false,
+                    Message = "Current password provided is incorrect.",
+                    Data = false
+                });
             }
 
             user.password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
-
             await _context.SaveChangesAsync();
 
             return Ok(new ApiResponse<bool>
             {
                 Success = true,
-                Message = "Password updated successfully in existing User table.",
+                Message = "Password updated successfully.",
                 Data = true
             });
         }
