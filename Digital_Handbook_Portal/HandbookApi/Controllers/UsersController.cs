@@ -70,9 +70,22 @@ namespace HandbookApi.Controllers
         {
             if (session == null) return BadRequest("Invalid session data");
 
-            var existingUser = await _context.User.FindAsync(session.userId);
+            User? existingUser = null;
+
+            if (session.userId > 0)
+            {
+                existingUser = await _context.User.FindAsync(session.userId);
+            }
+
+            if (existingUser == null && !string.IsNullOrWhiteSpace(session.Email))
+            {
+                existingUser = await _context.User
+                    .FirstOrDefaultAsync(u => u.email.ToLower() == session.Email.ToLower());
+            }
+
             if (existingUser != null)
             {
+                session.userId = existingUser.userId;
                 session.User = existingUser;
             }
 

@@ -1,6 +1,7 @@
 ﻿using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
+using Microsoft.Extensions.Configuration;
 
 namespace HandbookApi.Services
 {
@@ -17,15 +18,25 @@ namespace HandbookApi.Services
         {
             var emailSettings = _config.GetSection("EmailSettings");
 
+            string senderEmail = emailSettings["SenderEmail"] ?? emailSettings["Username"] ?? string.Empty;
+            string senderName = emailSettings["SenderName"] ?? "Digital Handbook Admin";
+
+            if (string.IsNullOrWhiteSpace(senderEmail))
+            {
+                throw new ArgumentException("Sender email address is not configured in EmailSettings.");
+            }
+
+            if (string.IsNullOrWhiteSpace(recipientEmail))
+            {
+                throw new ArgumentException("Recipient email address cannot be empty.", nameof(recipientEmail));
+            }
+
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(
-                emailSettings["SenderName"] ?? "Digital Handbook Admin",
-                emailSettings["SenderEmail"]
-            ));
-            message.To.Add(new MailboxAddress(fullName ?? "Staff Member", recipientEmail));
+            message.From.Add(new MailboxAddress(senderName, senderEmail));
+            message.To.Add(new MailboxAddress(string.IsNullOrWhiteSpace(fullName) ? "Staff Member" : fullName, recipientEmail));
             message.Subject = "Welcome to Employee Digital Handbook - Account Credentials";
 
-            string expirationHour = TimeOnly.FromTimeSpan(TimeSpan.FromHours(changePasswordHours)).ToString("dd MMMM yyyy");
+            string expirationTime = DateTime.UtcNow.AddHours(changePasswordHours).ToString("dd MMMM yyyy HH:mm") + " UTC";
 
             var bodyBuilder = new BodyBuilder
             {
@@ -35,7 +46,7 @@ namespace HandbookApi.Services
                             <h2 style='margin: 0;'>Welcome to Employee Digital Handbook</h2>
                         </div>
                         <div style='padding: 24px; color: #333333;'>
-                            <p>Dear <strong>{fullName ?? "Staff Member"}</strong>,</p>
+                            <p>Dear <strong>{(string.IsNullOrWhiteSpace(fullName) ? "Staff Member" : fullName)}</strong>,</p>
                             <p>An account has been created for you on the Employee Digital Handbook system.</p>
                             
                             <div style='background-color: #f8f9fa; border-left: 4px solid #0056b3; padding: 16px; margin: 20px 0;'>
@@ -44,7 +55,7 @@ namespace HandbookApi.Services
                             </div>
 
                             <p style='color: #d9534f; font-weight: bold;'>
-                                ⚠️ For security purposes, you are required to log in to the Android App and change this password within {changePasswordHours} hours (by {expirationHour}).
+                                ⚠️ For security purposes, you are required to log in to the Android App and change this password within {changePasswordHours} hour(s) (by {expirationTime}).
                             </p>
 
                             <p>Please log in using the mobile application and update your password immediately upon first launch.</p>
@@ -56,13 +67,27 @@ namespace HandbookApi.Services
 
             message.Body = bodyBuilder.ToMessageBody();
 
+            // Safe Port Resolution
+            string rawPort = emailSettings["Port"] ?? "587";
+            if (!int.TryParse(rawPort, out int portNumber))
+            {
+                portNumber = 587;
+            }
+
             using var client = new SmtpClient();
+            client.ServerCertificateValidationCallback = (s, c, h, e) => true;
+
             await client.ConnectAsync(
-                emailSettings["SmtpServer"],
-                int.Parse(emailSettings["Port"] ?? "587"),
+                emailSettings["SmtpServer"] ?? "smtp.gmail.com",
+                portNumber,
                 SecureSocketOptions.StartTls
             );
-            await client.AuthenticateAsync(emailSettings["Username"], emailSettings["Password"]);
+
+            await client.AuthenticateAsync(
+                emailSettings["Username"] ?? senderEmail,
+                emailSettings["Password"]
+            );
+
             await client.SendAsync(message);
             await client.DisconnectAsync(true);
         }
