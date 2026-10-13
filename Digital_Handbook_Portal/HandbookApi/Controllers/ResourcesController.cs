@@ -43,7 +43,7 @@ namespace HandbookApi.Controllers
         // POST: api/Resources
         [HttpPost]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> CreateResource([FromForm] Resource resource, [FromForm] IFormFile? uploadFile)
+        public async Task<IActionResult> CreateResource([FromForm] Resource resource, IFormFile? uploadFile)
         {
             ModelState.Remove(nameof(Resource.Id));
 
@@ -77,7 +77,7 @@ namespace HandbookApi.Controllers
         // PUT: api/Resources/5
         [HttpPut("{id}")]
         [Consumes("multipart/form-data")]
-        public async Task<ActionResult<ApiResponse<Resource>>> UpdateResource(int id, [FromForm] Resource resource, [FromForm] IFormFile? uploadFile)
+        public async Task<ActionResult<ApiResponse<Resource>>> UpdateResource(int id, [FromForm] Resource resource, IFormFile? uploadFile)
         {
             if (id != resource.Id)
             {

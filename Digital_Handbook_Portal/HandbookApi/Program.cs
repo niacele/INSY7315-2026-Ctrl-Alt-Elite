@@ -1,6 +1,6 @@
-using Digital_Handbook_Portal.Models;
 using HandbookApi.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 
 namespace HandbookApi
 {
@@ -31,7 +31,18 @@ namespace HandbookApi
             builder.Services.AddScoped<ICloudStorageService, CloudStorageService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Handbook API", Version = "v1" });
+
+                c.MapType<IFormFile>(() => new OpenApiSchema
+                {
+                    Type = JsonSchemaType.String,
+                    Format = "binary"
+                });
+
+                c.CustomSchemaIds(type => type.FullName);
+            });
 
             builder.Services.AddCors(options =>
             {
