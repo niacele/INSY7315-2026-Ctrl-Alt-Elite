@@ -31,11 +31,9 @@ namespace HandbookApi.Controllers
 
             try
             {
-                //initialize storage client
                 var storage = StorageClient.Create();
                 var memoryStream = new MemoryStream();
 
-                //extract relative object path - policies stored in digihandbook-bucket which is in the filepath so we need to remove it from the object name
                 var uri = new Uri(policy.fileUrl);
                 string objectName = uri.AbsolutePath.TrimStart('/')
                                        .Replace("digihandbook-bucket/", "");
@@ -126,7 +124,7 @@ namespace HandbookApi.Controllers
         // POST: api/Policies
         [HttpPost]
         [Consumes("multipart/form-data")]
-        public async Task<ActionResult<ApiResponse<Policy>>> CreatePolicy([FromForm] Policy policy, [FromForm] IFormFile? pdfFile)
+        public async Task<ActionResult<ApiResponse<Policy>>> CreatePolicy([FromForm] Policy policy, IFormFile? pdfFile)
         {
             ModelState.Remove(nameof(Policy.policyId));
             ModelState.Remove(nameof(Policy.Category));
@@ -166,7 +164,7 @@ namespace HandbookApi.Controllers
         // PUT: api/Policies/5
         [HttpPut("{id}")]
         [Consumes("multipart/form-data")]
-        public async Task<ActionResult<ApiResponse<Policy>>> UpdatePolicy(int id, [FromForm] Policy policy, [FromForm] IFormFile? pdfFile)
+        public async Task<ActionResult<ApiResponse<Policy>>> UpdatePolicy(int id, [FromForm] Policy policy, IFormFile? pdfFile)
         {
             var existingPolicy = await _context.Policy.FindAsync(id);
             if (existingPolicy == null)
