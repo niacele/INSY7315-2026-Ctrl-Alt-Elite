@@ -68,6 +68,7 @@ namespace HandbookApi.Controllers
 
         // POST: api/Doctors
         [HttpPost]
+        [Consumes("multipart/form-data")]
         public async Task<ActionResult<ApiResponse<Doctor>>> CreateDoctor([FromForm] Doctor doctor, IFormFile? imageFile)
         {
             try
@@ -105,6 +106,7 @@ namespace HandbookApi.Controllers
 
         // PUT: api/Doctors/5
         [HttpPut("{id}")]
+        [Consumes("multipart/form-data")]
         public async Task<ActionResult<ApiResponse<Doctor>>> EditDoctor(int id, [FromForm] Doctor doctor, IFormFile? imageFile)
         {
             if (id != doctor.doctorId)

@@ -123,22 +123,27 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupDrawerMenu() {
-        findViewById<TextView>(R.id.menuQuiz).setOnClickListener {
+        findViewById<TextView>(R.id.menuQuiz)?.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.END)
             navController.navigate(R.id.quizListFragment)
         }
 
-        findViewById<TextView>(R.id.menuCpdInfo).setOnClickListener {
+        findViewById<TextView>(R.id.menuCpdInfo)?.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.END)
             navController.navigate(R.id.resourcesFrontFragment)
         }
 
-        findViewById<TextView>(R.id.menuPolicies).setOnClickListener {
+        findViewById<TextView>(R.id.menuPolicies)?.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.END)
             navController.navigate(R.id.policiesFrontFragment)
         }
 
-        findViewById<TextView>(R.id.menuLogOut).setOnClickListener {
+        findViewById<TextView>(R.id.menuReset)?.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.END)
+            navController.navigate(R.id.ResetPasswordFragment)
+        }
+
+        findViewById<TextView>(R.id.menuLogOut)?.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.END)
 
             // Sync remaining tracking logs and clear saved user preferences

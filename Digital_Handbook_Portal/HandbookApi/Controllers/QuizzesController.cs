@@ -30,7 +30,6 @@ namespace HandbookApi.Controllers
 
         // GET: api/Quizzes/results-summary
         [HttpGet("results-summary")]
-        [Route("results-summary")]
         public async Task<ActionResult<ApiResponse<List<UserCpdSummaryViewModel>>>> GetResultsSummary()
         {
             try

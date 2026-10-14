@@ -112,7 +112,4 @@
             tools:listitem="@layout/item_policy_card" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

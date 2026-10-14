@@ -12,6 +12,10 @@
         android:label="Login"
         tools:layout="@layout/fragment_login">
 
+<!--        <action-->
+<!--            android:id="@+id/action_loginFragment_to_resetPasswordFragment"-->
+<!--            app:destination="@id/ResetPasswordFragment"/>-->
+
         <action
             android:id="@+id/action_loginFragment_to_homePageFragment"
             app:destination="@id/homePageFragment"
@@ -223,5 +227,10 @@
             android:id="@+id/action_takeQuizFragment_to_quizResultFragment"
             app:destination="@id/quizResultFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/ResetPasswordFragment"
+        android:name="com.example.employeedigitalhandbook.admin.ResetPasswordFragment"
+        android:label="Reset Password" />
 
 </navigation>

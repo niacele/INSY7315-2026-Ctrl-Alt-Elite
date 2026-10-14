@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.employeedigitalhandbook.api.ApiClient
@@ -19,6 +20,7 @@ import com.google.android.material.textfield.TextInputEditText
 class LoginFragment : Fragment() {
 
     private lateinit var viewModel: LoginViewModel
+    private lateinit var forgotPasswordTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +39,7 @@ class LoginFragment : Fragment() {
         val emailEditText = view.findViewById<TextInputEditText>(R.id.emailEditText)
         val passwordEditText = view.findViewById<TextInputEditText>(R.id.passwordEditText)
         val loginButton = view.findViewById<MaterialButton>(R.id.loginButton)
+        //val forgotPasswordTextView = view.findViewById<TextView>(R.id.forgotPasswordTextView)
 
         loginButton.setOnClickListener {
             val email = emailEditText.text?.toString().orEmpty()
@@ -45,6 +48,10 @@ class LoginFragment : Fragment() {
             loginButton.isEnabled = false
             viewModel.login(email, password)
         }
+
+//        forgotPasswordTextView.setOnClickListener {
+//            findNavController().navigate(R.id.action_loginFragment_to_resetPasswordFragment)
+//        }
 
         viewModel.loginState.observe(viewLifecycleOwner) { result ->
             loginButton.isEnabled = true

@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -22,7 +24,7 @@ class CommunityFragment : Fragment() {
 
     private lateinit var communityViewModel: CommunityViewModel
     private lateinit var eventAdapter: EventAdapter
-    private lateinit var btnBack: Button
+    private lateinit var backArrowImageView: ImageView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,13 +46,13 @@ class CommunityFragment : Fragment() {
         eventAdapter = EventAdapter(emptyList()) { selectedEvent ->
             Toast.makeText(
                 requireContext(),
-                "${selectedEvent.title} - ${selectedEvent.location}",
+                "${selectedEvent.title}\n${selectedEvent.location}",
                 Toast.LENGTH_SHORT
             ).show()
         }
         recyclerView.adapter = eventAdapter
 
-        btnBack.setOnClickListener {
+        backArrowImageView.setOnClickListener {
             findNavController().navigateUp()
         }
 
@@ -82,21 +84,5 @@ class CommunityFragment : Fragment() {
         })
 
         communityViewModel.loadEvents()
-//
-//        val bottomNavigation = view.findViewById<BottomNavigationView>(R.id.bottomNavigation)
-//        bottomNavigation.selectedItemId = R.id.nav_home
-//        bottomNavigation.setOnItemSelectedListener { item ->
-//            when (item.itemId) {
-//                R.id.nav_home -> {
-//                    findNavController().navigate(R.id.action_communityFragment_to_homePageFragment)
-//                    true
-//                }
-//                R.id.nav_menu -> {
-//                    findNavController().navigate(R.id.action_communityFragment_to_settingsFragment)
-//                    true
-//                }
-//                else -> false
-//            }
-//        }
     }
 }
