@@ -130,10 +130,10 @@
                         android:layout_height="wrap_content"
                         android:indeterminateTint="#2690CF"
                         android:visibility="visible"
-                        app:layout_constraintBottom_toBottomOf="@+id/resourceWebView"
-                        app:layout_constraintEnd_toEndOf="@+id/resourceWebView"
-                        app:layout_constraintStart_toStartOf="@+id/resourceWebView"
-                        app:layout_constraintTop_toTopOf="@+id/resourceWebView" />
+                        app:layout_constraintBottom_toBottomOf="@+id/pdfScrollView"
+                        app:layout_constraintEnd_toEndOf="@+id/pdfScrollView"
+                        app:layout_constraintStart_toStartOf="@+id/pdfScrollView"
+                        app:layout_constraintTop_toTopOf="@+id/pdfScrollView" />
 
                     <!-- Breadcrumbs / Categorical Path -->
                     <TextView
