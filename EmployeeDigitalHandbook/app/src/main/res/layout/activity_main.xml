@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -8,16 +7,16 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!-- Active fragment loads here (Login, Home, Community, etc.) -->
+    <!-- Active fragment loads here via NavHost -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:navGraph="@navigation/nav_graph"
-        app:defaultNavHost="true" />
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph" />
 
-    <!-- Slide-Out Menu from the Right -->
+    <!-- Slide-Out Menu from Right -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/slideOutMenu"
         android:layout_width="280dp"
@@ -28,92 +27,123 @@
         android:elevation="16dp"
         android:fitsSystemWindows="true"
         android:focusable="true"
-        android:paddingHorizontal="24dp">
+        android:paddingHorizontal="24dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="24dp">
 
-        <TextView
-            android:id="@+id/menuPolicies"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="120dp"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/raleway_bold"
-            android:paddingStart="16dp"
-            android:paddingEnd="8dp"
-            android:paddingVertical="14dp"
-            android:text="Policies"
-            android:textAlignment="viewStart"
-            android:textColor="@color/white"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
+        <!-- 1. Quiz -->
         <TextView
             android:id="@+id/menuQuiz"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="32dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:fontFamily="@font/raleway_bold"
-            android:paddingStart="16dp"
-            android:paddingEnd="8dp"
+            android:gravity="end|center_vertical"
+            android:paddingHorizontal="16dp"
             android:paddingVertical="14dp"
             android:text="Quiz"
-            android:textAlignment="viewStart"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <!-- 2. Resources -->
         <TextView
             android:id="@+id/menuCpdInfo"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:fontFamily="@font/raleway_bold"
-            android:paddingStart="16dp"
-            android:paddingEnd="8dp"
+            android:gravity="end|center_vertical"
+            android:paddingHorizontal="16dp"
             android:paddingVertical="14dp"
             android:text="Resources"
-            android:textAlignment="viewStart"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/menuQuiz" />
 
-
+        <!-- 3. Policies -->
         <TextView
-            android:id="@+id/menuLogOut"
+            android:id="@+id/menuPolicies"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="64dp"
             android:background="?attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:fontFamily="@font/raleway_bold"
-            android:paddingStart="16dp"
-            android:paddingEnd="8dp"
+            android:gravity="end|center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp"
+            android:text="Policies"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/menuCpdInfo" />
+
+        <!-- 4. Reset Password -->
+        <TextView
+            android:id="@+id/menuReset"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/raleway_bold"
+            android:gravity="end|center_vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp"
+            android:text="Reset Password"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/menuPolicies" />
+
+        <!-- Menu Divider -->
+        <View
+            android:id="@+id/menuDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="#4AFFFFFF"
+            app:layout_constraintBottom_toTopOf="@id/menuLogOut"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <!-- 5. Log Out -->
+        <TextView
+            android:id="@+id/menuLogOut"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/raleway_bold"
+            android:gravity="end|center_vertical"
+            android:paddingHorizontal="16dp"
             android:paddingVertical="14dp"
             android:text="Log out"
-            android:textAlignment="viewStart"
             android:textColor="@color/white"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.drawerlayout.widget.DrawerLayout>
