@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "770247469632",
+    "project_id": "digitalhandbook",
+    "storage_bucket": "digitalhandbook.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:770247469632:android:440ab71d02f58bca860da5",
+        "android_client_info": {
+          "package_name": "com.example.employeedigitalhandbook"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDk1P5zSD1YkSBSIJut466x9ZNcFm3XLu0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
