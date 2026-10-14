@@ -14,7 +14,18 @@ class AuthRepository(private val sessionManager: SessionManager) {
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!
 
-                val resolvedEmail = body.email?.takeIf { it.isNotBlank() } ?: email.trim()
+                // Unpack nested 'data' payload if available, else fallback to top-level fields
+                val userData = body.data
+
+                val rawUserId = userData?.userId?.takeIf { it > 0 }
+                    ?: body.userId?.takeIf { it > 0 }
+
+                val rawEmail = userData?.email?.takeIf { it.isNotBlank() }
+                    ?: body.email?.takeIf { it.isNotBlank() }
+                    ?: email.trim()
+
+                val rawName = userData?.fullName?.takeIf { it.isNotBlank() }
+                    ?: body.name?.takeIf { it.isNotBlank() }
 
                 val derivedName = email.substringBefore("@")
                     .split(".", "_", "-")
@@ -22,23 +33,25 @@ class AuthRepository(private val sessionManager: SessionManager) {
                         part.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
                     }
 
-                val resolvedName = body.name?.takeIf { it.isNotBlank() } ?: derivedName
+                val resolvedName = rawName ?: derivedName
 
-                val resolvedId = body.userId?.toString() ?: "1"
-
-                if (resolvedEmail.isNotEmpty()) {
-                    val userSession = UserSession(
-                        userId = resolvedId,
-                        email = resolvedEmail,
-                        fullName = resolvedName
-                    )
-
-                    sessionManager.saveSession(userSession)
-
-                    AuthResult.Success(userSession)
+                // Verify valid User ID was extracted
+                val resolvedId = if (rawUserId != null && rawUserId > 0) {
+                    rawUserId.toString()
                 } else {
-                    AuthResult.Error("User data is empty")
+                    return AuthResult.Error("Failed to retrieve valid User ID from server.")
                 }
+
+                val userSession = UserSession(
+                    userId = resolvedId,
+                    email = rawEmail,
+                    fullName = resolvedName
+                )
+
+                // Save session with true ID (3)
+                sessionManager.saveSession(userSession)
+
+                AuthResult.Success(userSession)
             } else {
                 AuthResult.Error("Login failed: ${response.message()}")
             }
