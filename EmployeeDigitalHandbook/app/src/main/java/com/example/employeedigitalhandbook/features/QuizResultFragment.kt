@@ -76,11 +76,14 @@ class QuizResultFragment : Fragment() {
         passed: Boolean,
         pointsStr: String
     ) {
-        val numericPercentage = percentageStr.replace("%", "").toIntOrNull() ?: 0
-        val numericPoints = pointsStr.replace("+", "").toDoubleOrNull() ?: 0.0
+        val numericPercentage = percentageStr.replace("%", "").trim().toIntOrNull() ?: 0
+        val numericPoints = pointsStr.replace("+", "").trim().toDoubleOrNull() ?: 0.0
 
         val sessionManager = SessionManager(requireContext().applicationContext)
-        val userIdInt = sessionManager.getSession()?.userId?.toIntOrNull() ?: 1
+        val sessionUser = sessionManager.getSession()
+
+        // Safely parse userId, defaulting to null if <= 0
+        val userIdInt = sessionUser?.userId?.toIntOrNull()?.takeIf { it > 0 }
 
         val submission = QuizSubmission(
             quizId = quizId,
@@ -93,7 +96,12 @@ class QuizResultFragment : Fragment() {
 
         lifecycleScope.launch {
             try {
-                ApiClient.apiService.submitQuizResult(submission)
+                val response = ApiClient.apiService.submitQuizResult(submission)
+                if (response.isSuccessful && response.body()?.success == true) {
+                    Toast.makeText(requireContext(), "CPD Points successfully updated!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(requireContext(), "Sync failed: ${response.message()}", Toast.LENGTH_SHORT).show()
+                }
             } catch (e: Exception) {
                 Toast.makeText(requireContext(), "Result sync error: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
             }
