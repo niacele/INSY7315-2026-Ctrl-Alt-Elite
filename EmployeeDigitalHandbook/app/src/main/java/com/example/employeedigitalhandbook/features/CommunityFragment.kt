@@ -37,6 +37,7 @@ class CommunityFragment : Fragment() {
 
         communityViewModel = ViewModelProvider(this)[CommunityViewModel::class.java]
 
+
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewEvents)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
