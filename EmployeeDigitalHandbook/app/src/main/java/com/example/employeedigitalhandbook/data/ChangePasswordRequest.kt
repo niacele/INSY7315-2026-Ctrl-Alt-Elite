@@ -3,12 +3,12 @@ package com.example.employeedigitalhandbook.data
 import com.google.gson.annotations.SerializedName
 
 data class ChangePasswordRequest(
-    @SerializedName("UserId")
+    @SerializedName("UserId", alternate = ["userId"])
     val userId: Int,
 
-    @SerializedName("CurrentPassword")
+    @SerializedName("CurrentPassword", alternate = ["currentPassword"])
     val currentPassword: String,
 
-    @SerializedName("NewPassword")
+    @SerializedName("NewPassword", alternate = ["newPassword"])
     val newPassword: String
 )
