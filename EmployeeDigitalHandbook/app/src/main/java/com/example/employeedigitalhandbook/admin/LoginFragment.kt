@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -52,6 +54,34 @@ class LoginFragment : Fragment() {
 //        forgotPasswordTextView.setOnClickListener {
 //            findNavController().navigate(R.id.action_loginFragment_to_resetPasswordFragment)
 //        }
+
+        //code to let the screen auto scroll when typing in the password text field
+        val scrollView = view.findViewById<android.widget.ScrollView>(R.id.loginScrollView)
+
+        androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(scrollView) { v, insets ->
+            val imeInsets = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.ime())
+            val systemBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+
+            v.setPadding(0, 0, 0, imeInsets.bottom + systemBars.bottom)
+            insets
+        }
+
+        emailEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                scrollView.postDelayed({
+                    scrollView.smoothScrollTo(0, emailEditText.top)
+                }, 200)
+            }
+        }
+
+        passwordEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                scrollView.postDelayed({
+                    scrollView.smoothScrollTo(0, passwordEditText.bottom + 120)
+                }, 200)
+            }
+        }
+
 
         viewModel.loginState.observe(viewLifecycleOwner) { result ->
             loginButton.isEnabled = true
