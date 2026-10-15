@@ -8,6 +8,9 @@ import com.example.employeedigitalhandbook.api.ApiClient.apiService
 import com.example.employeedigitalhandbook.data.CommunityEvent
 import com.example.employeedigitalhandbook.repositories.EventResult
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class CommunityViewModel : ViewModel() {
 
@@ -38,14 +41,37 @@ class CommunityViewModel : ViewModel() {
         }
     }
 
-    fun filterEventsByCategory(category: String) {
-        if (category.equals("All", ignoreCase = true)) {
-            _eventsState.value = EventResult.Success(originalEventList)
-        } else {
-            val filtered = originalEventList.filter {
-                it.category.equals(category, ignoreCase = true)
+    fun filterEventsByCategory(categoryLabel: String) {
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        val filtered = when (categoryLabel) {
+            "Upcoming" -> {
+                val calendar = Calendar.getInstance()
+                val todayStr = dateFormat.format(calendar.time)
+
+                calendar.add(Calendar.DAY_OF_YEAR, 7)
+                val nextWeekStr = dateFormat.format(calendar.time)
+
+                originalEventList.filter { event ->
+                    val eventDate = event.formattedDate
+                    eventDate != "TBA" && eventDate >= todayStr && eventDate <= nextWeekStr
+                }
             }
-            _eventsState.value = EventResult.Success(filtered)
+            "Social" -> {
+                originalEventList.filter { event ->
+                    event.category == "0" || event.category.equals("Social", ignoreCase = true)
+                }
+            }
+            "Wellness & Team" -> {
+                originalEventList.filter { event ->
+                    event.category == "1" || event.category == "2" ||
+                            event.category.equals("Wellness", ignoreCase = true) ||
+                            event.category.equals("TeamBuilding", ignoreCase = true)
+                }
+            }
+            else -> originalEventList // "All"
         }
+
+        _eventsState.value = EventResult.Success(filtered)
     }
 }
