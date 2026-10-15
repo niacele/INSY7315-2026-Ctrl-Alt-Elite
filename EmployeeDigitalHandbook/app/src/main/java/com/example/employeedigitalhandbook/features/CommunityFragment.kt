@@ -43,7 +43,7 @@ class CommunityFragment : Fragment() {
         backArrowImageView = view.findViewById(R.id.backArrowImageView)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewEvents)
-        val backArrowImageView = view.findViewById<ImageView>(R.id.backArrowImageView)
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         eventAdapter = EventAdapter(emptyList()) { selectedEvent ->
