@@ -1,6 +1,8 @@
 package com.example.employeedigitalhandbook.admin
 
 import android.os.Bundle
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,6 +41,33 @@ class ResetPasswordFragment : Fragment() {
         binding.savePasswordButton.setOnClickListener {
             attemptPasswordChange()
         }
+
+        //lets the user type in the confirm password text field without it being covered by the keyboard
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.resetScrollView) { v, insets ->
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            v.setPadding(0, 0, 0, imeInsets.bottom + systemBars.bottom)
+            insets
+        }
+
+        binding.newPasswordEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.resetScrollView.postDelayed({
+                    binding.resetScrollView.smoothScrollTo(0, binding.newPasswordInputLayout.top)
+                }, 200)
+            }
+        }
+
+        binding.confirmPasswordEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                binding.resetScrollView.postDelayed({
+                    binding.resetScrollView.smoothScrollTo(0, binding.confirmPasswordInputLayout.bottom + 150)
+                }, 200)
+            }
+        }
+
     }
 
     private fun attemptPasswordChange() {
