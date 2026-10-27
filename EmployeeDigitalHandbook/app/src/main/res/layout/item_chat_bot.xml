@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:paddingTop="14dp"
+    android:paddingBottom="10dp">
+
+    <!-- rectangle where text is going -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/botBubbleCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_bot_bubble"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="22dp"
+        android:paddingBottom="18dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.88">
+
+        <!-- bot response with dummy response -->
+        <TextView
+            android:id="@+id/botMessageText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/raleway"
+            android:lineSpacingExtra="3dp"
+            android:text="Immediately stop medication administration, notify attending ophthalmologist, and log occurrence in adverse incident register within 2 hours."
+            android:textColor="#1F2937"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- floating label for chat -->
+    <TextView
+        android:id="@+id/botPillBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:background="@drawable/bg_pill_badge_green"
+        android:elevation="6dp"
+        android:fontFamily="@font/raleway_bold"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="5dp"
+        android:text="Assistant"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/botBubbleCard"
+        app:layout_constraintStart_toStartOf="@+id/botBubbleCard"
+        app:layout_constraintTop_toTopOf="@+id/botBubbleCard" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
