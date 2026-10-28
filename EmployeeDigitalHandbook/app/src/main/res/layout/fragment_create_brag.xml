@@ -10,15 +10,15 @@
     <!-- Top Header: Back Button & Title -->
     <ImageView
         android:id="@+id/btnBackBrag"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
+        android:layout_width="42dp"
+        android:layout_height="38dp"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         android:contentDescription="Back"
         android:focusable="true"
-        android:src="@android:drawable/ic_media_previous"
+        android:src="@drawable/ic_back_new"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />

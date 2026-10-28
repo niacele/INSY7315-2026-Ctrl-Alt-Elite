@@ -30,7 +30,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:padding="12dp"
-                android:src="@android:drawable/ic_media_previous"
+                android:src="@drawable/ic_back_new"
                 app:layout_constraintBottom_toBottomOf="@id/detailsLogoImageView"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/detailsLogoImageView"

@@ -14,11 +14,17 @@ public class Digital_Handbook_PortalContext(DbContextOptions<Digital_Handbook_Po
     public DbSet<UserSession> UserSession { get; set; } = default!;
     public DbSet<FragmentVisit> FragmentVisit { get; set; } = default!;
     public DbSet<QuizResult> QuizResult { get; set; } = default!;
-
+    public DbSet<Faq> Faq { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Faq>(entity =>
+        {
+            entity.ToTable("Faq");
+            entity.HasKey(e => e.FaqId);
+        });
 
         modelBuilder.Entity<BragBook>(entity =>
         {
