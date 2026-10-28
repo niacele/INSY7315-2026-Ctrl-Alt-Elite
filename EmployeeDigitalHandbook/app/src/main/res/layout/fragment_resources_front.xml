@@ -42,7 +42,7 @@
             android:clickable="true"
             android:contentDescription="Back"
             android:focusable="true"
-            android:src="@android:drawable/ic_media_previous"
+            android:src="@drawable/ic_back_new"
             app:layout_constraintBottom_toBottomOf="@+id/pageTitleTextView"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/pageTitleTextView"
