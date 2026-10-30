@@ -96,7 +96,10 @@ interface ApiService {
     @POST("api/Users/change-password")
     suspend fun changePassword(@Body request: ChangePasswordRequest): Response<ApiResponse<Boolean>>
 
-    //--- Faq ---
+    // --- Faq ---
+    @GET("api/Faqs")
+    suspend fun getAllFaqs(): Response<ApiResponse<List<Faq>>>
+
     @GET("api/Faqs/query")
     suspend fun queryFaq(@Query("topicKey") topicKey: String): Response<ApiResponse<Faq>>
 }

@@ -98,24 +98,24 @@
             app:layout_constraintTop_toBottomOf="@id/menuCpdInfo" />
 
         <!-- 4. Reset Password -->
-        <TextView
-            android:id="@+id/menuReset"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/raleway_bold"
-            android:gravity="end|center_vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="14dp"
-            android:text="Reset Password"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/menuPolicies" />
+<!--        <TextView-->
+<!--            android:id="@+id/menuReset"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="?attr/selectableItemBackground"-->
+<!--            android:clickable="true"-->
+<!--            android:focusable="true"-->
+<!--            android:fontFamily="@font/raleway_bold"-->
+<!--            android:gravity="end|center_vertical"-->
+<!--            android:paddingHorizontal="16dp"-->
+<!--            android:paddingVertical="14dp"-->
+<!--            android:text="Reset Password"-->
+<!--            android:textColor="@color/white"-->
+<!--            android:textSize="20sp"-->
+<!--            android:textStyle="bold"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/menuPolicies" />-->
 
         <!-- 4. FAQ Chatbot -->
         <TextView

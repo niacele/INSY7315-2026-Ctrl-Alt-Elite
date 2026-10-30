@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -12,7 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.employeedigitalhandbook.adapters.ChatAdapter
 import com.example.employeedigitalhandbook.api.ApiClient
 import com.example.employeedigitalhandbook.data.ChatMessage
+import com.example.employeedigitalhandbook.data.Faq
 import com.example.employeedigitalhandbook.databinding.FragmentFaqBinding
+import com.google.android.material.chip.Chip
 import kotlinx.coroutines.launch
 
 class FAQ : Fragment() {
@@ -36,7 +38,7 @@ class FAQ : Fragment() {
 
         val safeBinding = binding ?: return
 
-        // Configure Chat RecyclerView
+        // Setup Chat RecyclerView
         safeBinding.chatRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext()).apply {
                 stackFromEnd = true
@@ -49,34 +51,66 @@ class FAQ : Fragment() {
             findNavController().navigateUp()
         }
 
-        // Chip Clicks mapped to PostgreSQL TopicKey values
-        safeBinding.chipAdverseDrug.setOnClickListener {
-            handleTopicSelected("What is the protocol for Adverse Drug Reactions?", "adverse_drug")
-        }
+        // Load all available FAQs dynamically from PostgreSQL
+        loadFaqTopicsFromDatabase()
+    }
 
-        safeBinding.chipCpdPoints.setOnClickListener {
-            handleTopicSelected("How do CPD points work?", "cpd_points")
-        }
+    private fun loadFaqTopicsFromDatabase() {
+        lifecycleScope.launch {
+            try {
+                // Call GET api/Faqs to retrieve all available FAQ entries
+                val response = ApiClient.apiService.getAllFaqs()
+                val safeBinding = binding ?: return@launch
 
-        safeBinding.chipTheatreSOP.setOnClickListener {
-            handleTopicSelected("Theatre Slate Breaks", "theatre_sop")
+                if (response.isSuccessful && response.body() != null) {
+                    val apiResponse = response.body()!!
+                    if (apiResponse.success && !apiResponse.data.isNullOrEmpty()) {
+                        populateDynamicChips(apiResponse.data)
+                    } else {
+                        showNoTopicsAvailableMessage()
+                    }
+                } else {
+                    showNoTopicsAvailableMessage()
+                }
+            } catch (e: Exception) {
+                showNoTopicsAvailableMessage()
+            }
         }
+    }
 
-        safeBinding.chipContactAdmin.setOnClickListener {
-            handleTopicSelected("Doctor Extensions", "doctor_extensions")
+    private fun populateDynamicChips(faqList: List<Faq>) {
+        val safeBinding = binding ?: return
+        safeBinding.presetChipGroup.removeAllViews()
+
+        for (faq in faqList) {
+            val chip = Chip(requireContext()).apply {
+                text = faq.question
+                isCheckable = false
+                isClickable = true
+
+                // Uses standard system color or your primary color safely
+                setChipBackgroundColorResource(android.R.color.white)
+                chipStrokeWidth = 2f
+                chipStrokeColor = ContextCompat.getColorStateList(requireContext(), android.R.color.holo_blue_dark)
+                setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_blue_dark))
+
+                setOnClickListener {
+                    handleTopicSelected(faq.question, faq.topicKey)
+                }
+            }
+            safeBinding.presetChipGroup.addView(chip)
         }
     }
 
     private fun handleTopicSelected(displayQuestion: String, topicKey: String) {
         // 1. Append user prompt bubble
         chatAdapter.addMessage(ChatMessage(message = displayQuestion, isUser = true))
-        binding?.chatRecyclerView?.smoothScrollToPosition(chatAdapter.itemCount - 1)
+        scrollToBottom()
 
-        // 2. Fetch answer from ASP.NET Core API
+        // 2. Fetch answer dynamically by topicKey
         lifecycleScope.launch {
             try {
                 val response = ApiClient.apiService.queryFaq(topicKey)
-                val safeBinding = binding ?: return@launch
 
                 if (response.isSuccessful && response.body() != null) {
                     val apiResponse = response.body()!!
@@ -85,19 +119,34 @@ class FAQ : Fragment() {
                             ChatMessage(message = apiResponse.data.answer, isUser = false)
                         )
                     } else {
-                        val message = apiResponse.message ?: "No FAQ entry found for this topic."
+                        val message = apiResponse.message ?: "Information for this topic is currently unavailable."
                         chatAdapter.addMessage(ChatMessage(message = message, isUser = false))
                     }
                 } else {
                     chatAdapter.addMessage(
-                        ChatMessage(message = "Unable to fetch answer (HTTP ${response.code()}).", isUser = false)
+                        ChatMessage(message = "Unable to fetch topic response.", isUser = false)
                     )
                 }
-                safeBinding.chatRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                scrollToBottom()
             } catch (e: Exception) {
                 chatAdapter.addMessage(
                     ChatMessage(message = "Network error: ${e.localizedMessage}", isUser = false)
                 )
+                scrollToBottom()
+            }
+        }
+    }
+
+    private fun showNoTopicsAvailableMessage() {
+        chatAdapter.addMessage(
+            ChatMessage(message = "Welcome to Handbook FAQ! No FAQ topics are currently available.", isUser = false)
+        )
+    }
+
+    private fun scrollToBottom() {
+        binding?.chatRecyclerView?.post {
+            if (chatAdapter.itemCount > 0) {
+                binding?.chatRecyclerView?.smoothScrollToPosition(chatAdapter.itemCount - 1)
             }
         }
     }
