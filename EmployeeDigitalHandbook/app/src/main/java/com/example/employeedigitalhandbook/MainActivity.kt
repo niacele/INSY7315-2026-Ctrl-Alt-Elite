@@ -143,6 +143,11 @@ class MainActivity : AppCompatActivity() {
             navController.navigate(R.id.ResetPasswordFragment)
         }
 
+        findViewById<TextView>(R.id.menuFAQ)?.setOnClickListener {
+            drawerLayout.closeDrawer(GravityCompat.END)
+            navController.navigate(R.id.faqFragment)
+        }
+
         findViewById<TextView>(R.id.menuLogOut)?.setOnClickListener {
             drawerLayout.closeDrawer(GravityCompat.END)
 

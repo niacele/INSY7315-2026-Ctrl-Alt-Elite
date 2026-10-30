@@ -143,6 +143,13 @@
             app:destination="@id/resourcesBackFragment" />
     </fragment>
 
+    <!-- FAQ -->
+    <fragment
+        android:id="@+id/faqFragment"
+        android:name="com.example.employeedigitalhandbook.features.FAQ"
+        android:label="FAQ"
+        tools:layout="@layout/fragment_faq" />
+
     <!-- Resources Detail/WebView Destination -->
     <fragment
         android:id="@+id/resourcesBackFragment"
