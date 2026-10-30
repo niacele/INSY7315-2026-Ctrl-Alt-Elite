@@ -21,6 +21,7 @@ class EventAdapter(
         val date: TextView = itemView.findViewById(R.id.txtEventDate)
         val time: TextView = itemView.findViewById(R.id.txtEventTime)
         val location: TextView = itemView.findViewById(R.id.txtEventLocation)
+        val description: TextView = itemView.findViewById(R.id.txtDescription)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventViewHolder {
@@ -36,6 +37,9 @@ class EventAdapter(
         holder.date.text = event.formattedDate
         holder.time.text = event.formattedTime
         holder.location.text = if (event.location.isNotBlank()) event.location else "N/A"
+
+        // Bind description
+        holder.description.text = if (event.description.isNotBlank()) event.description else "No description available"
 
         val colorHex = when (position % 3) {
             0 -> "#2690CF"

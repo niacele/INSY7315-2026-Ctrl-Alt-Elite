@@ -5,10 +5,13 @@ import com.google.gson.annotations.SerializedName
 data class CommunityEvent(
     @SerializedName("eventId") val eventId: Int = 0,
     @SerializedName("title") val title: String = "",
+    @SerializedName("description", alternate = ["Description", "details", "Details"])
+    val description: String = "",
     @SerializedName("eventDate", alternate = ["date", "eventDateTime", "dateTime", "Date"])
     val rawDateTime: String? = null,
     @SerializedName("location") val location: String = "",
-    @SerializedName("category") val category: String = ""
+    @SerializedName("eventCategory", alternate = ["category", "Category", "EventCategory"])
+    val category: String = ""
 ) {
     val formattedDate: String
         get() {

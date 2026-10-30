@@ -133,6 +133,40 @@ namespace HandbookApi.Migrations
                     b.ToTable("Doctor", (string)null);
                 });
 
+            modelBuilder.Entity("Digital_Handbook_Portal.Models.Faq", b =>
+                {
+                    b.Property<int>("FaqId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("faqId");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("FaqId"));
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("answer");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("category");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("question");
+
+                    b.Property<string>("TopicKey")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("topicKey");
+
+                    b.HasKey("FaqId");
+
+                    b.ToTable("Faq", (string)null);
+                });
+
             modelBuilder.Entity("Digital_Handbook_Portal.Models.FragmentVisit", b =>
                 {
                     b.Property<int>("VisitId")

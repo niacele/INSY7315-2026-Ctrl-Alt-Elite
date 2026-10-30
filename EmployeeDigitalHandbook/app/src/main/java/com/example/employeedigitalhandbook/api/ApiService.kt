@@ -9,6 +9,7 @@ import com.example.employeedigitalhandbook.data.QuizSubmission
 import com.example.employeedigitalhandbook.data.Resource
 import com.example.employeedigitalhandbook.api.ApiResponse
 import com.example.employeedigitalhandbook.data.ChangePasswordRequest
+import com.example.employeedigitalhandbook.data.Faq
 import com.example.employeedigitalhandbook.sessions.UserSessionPayload
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -16,6 +17,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
 import retrofit2.http.Streaming
 import retrofit2.http.Url
 
@@ -93,4 +95,8 @@ interface ApiService {
     // --- Change Password ---
     @POST("api/Users/change-password")
     suspend fun changePassword(@Body request: ChangePasswordRequest): Response<ApiResponse<Boolean>>
+
+    //--- Faq ---
+    @GET("api/Faqs/query")
+    suspend fun queryFaq(@Query("topicKey") topicKey: String): Response<ApiResponse<Faq>>
 }

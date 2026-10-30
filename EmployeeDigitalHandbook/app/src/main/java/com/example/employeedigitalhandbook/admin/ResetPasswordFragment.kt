@@ -1,6 +1,5 @@
 package com.example.employeedigitalhandbook.admin
 
-import android.content.Context
 import android.os.Bundle
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -15,6 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.example.employeedigitalhandbook.api.ApiClient
 import com.example.employeedigitalhandbook.data.ChangePasswordRequest
 import com.example.employeedigitalhandbook.databinding.FragmentResetPasswordBinding
+import com.example.employeedigitalhandbook.sessions.SessionManager
 import kotlinx.coroutines.launch
 
 class ResetPasswordFragment : Fragment() {
@@ -101,7 +101,7 @@ class ResetPasswordFragment : Fragment() {
             return
         }
 
-        // 3. Get Active User ID
+        // 3. Get Active User ID via SessionManager
         val activeUserId = getLoggedUserId()
         if (activeUserId == -1) {
             Toast.makeText(requireContext(), "User session expired. Please log in again.", Toast.LENGTH_SHORT).show()
@@ -156,8 +156,19 @@ class ResetPasswordFragment : Fragment() {
     }
 
     private fun getLoggedUserId(): Int {
-        val sharedPref = requireActivity().getSharedPreferences("UserSession", Context.MODE_PRIVATE)
-        return sharedPref.getInt("USER_ID", -1)
+        val sessionManager = SessionManager(requireContext().applicationContext)
+        val userSession = sessionManager.getSession()
+
+        android.util.Log.d("ResetPassword", "Active Session UserId: ${userSession?.userId}")
+
+        val parsedId = userSession?.userId?.toIntOrNull() ?: -1
+
+        if (parsedId <= 0) {
+            val sharedPref = requireActivity().getSharedPreferences("UserPrefs", android.content.Context.MODE_PRIVATE)
+            return sharedPref.getInt("USER_ID", -1)
+        }
+
+        return parsedId
     }
 
     override fun onDestroyView() {

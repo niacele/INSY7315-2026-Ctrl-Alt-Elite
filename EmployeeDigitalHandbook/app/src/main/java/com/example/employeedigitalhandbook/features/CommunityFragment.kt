@@ -39,8 +39,12 @@ class CommunityFragment : Fragment() {
 
         communityViewModel = ViewModelProvider(this)[CommunityViewModel::class.java]
 
+        // Initialize btnBack before calling setOnClickListener
+
+        backArrowImageView = view.findViewById(R.id.backArrowImageView)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recyclerViewEvents)
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         eventAdapter = EventAdapter(emptyList()) { selectedEvent ->

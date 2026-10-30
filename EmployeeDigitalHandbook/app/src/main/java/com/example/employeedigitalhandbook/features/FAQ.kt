@@ -1,60 +1,109 @@
 package com.example.employeedigitalhandbook.features
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.employeedigitalhandbook.R
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.employeedigitalhandbook.adapters.ChatAdapter
+import com.example.employeedigitalhandbook.api.ApiClient
+import com.example.employeedigitalhandbook.data.ChatMessage
+import com.example.employeedigitalhandbook.databinding.FragmentFaqBinding
+import kotlinx.coroutines.launch
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [FAQ.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FAQ : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+    private var _binding: FragmentFaqBinding? = null
+    private val binding get() = _binding
+
+    private val chatAdapter = ChatAdapter(mutableListOf())
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentFaqBinding.inflate(inflater, container, false)
+        return binding?.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val safeBinding = binding ?: return
+
+        // Configure Chat RecyclerView
+        safeBinding.chatRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext()).apply {
+                stackFromEnd = true
+            }
+            adapter = chatAdapter
+        }
+
+        // Navigation
+        safeBinding.backButton.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
+        // Chip Clicks mapped to PostgreSQL TopicKey values
+        safeBinding.chipAdverseDrug.setOnClickListener {
+            handleTopicSelected("What is the protocol for Adverse Drug Reactions?", "adverse_drug")
+        }
+
+        safeBinding.chipCpdPoints.setOnClickListener {
+            handleTopicSelected("How do CPD points work?", "cpd_points")
+        }
+
+        safeBinding.chipTheatreSOP.setOnClickListener {
+            handleTopicSelected("Theatre Slate Breaks", "theatre_sop")
+        }
+
+        safeBinding.chipContactAdmin.setOnClickListener {
+            handleTopicSelected("Doctor Extensions", "doctor_extensions")
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_faq, container, false)
+    private fun handleTopicSelected(displayQuestion: String, topicKey: String) {
+        // 1. Append user prompt bubble
+        chatAdapter.addMessage(ChatMessage(message = displayQuestion, isUser = true))
+        binding?.chatRecyclerView?.smoothScrollToPosition(chatAdapter.itemCount - 1)
+
+        // 2. Fetch answer from ASP.NET Core API
+        lifecycleScope.launch {
+            try {
+                val response = ApiClient.apiService.queryFaq(topicKey)
+                val safeBinding = binding ?: return@launch
+
+                if (response.isSuccessful && response.body() != null) {
+                    val apiResponse = response.body()!!
+                    if (apiResponse.success && apiResponse.data != null) {
+                        chatAdapter.addMessage(
+                            ChatMessage(message = apiResponse.data.answer, isUser = false)
+                        )
+                    } else {
+                        val message = apiResponse.message ?: "No FAQ entry found for this topic."
+                        chatAdapter.addMessage(ChatMessage(message = message, isUser = false))
+                    }
+                } else {
+                    chatAdapter.addMessage(
+                        ChatMessage(message = "Unable to fetch answer (HTTP ${response.code()}).", isUser = false)
+                    )
+                }
+                safeBinding.chatRecyclerView.smoothScrollToPosition(chatAdapter.itemCount - 1)
+            } catch (e: Exception) {
+                chatAdapter.addMessage(
+                    ChatMessage(message = "Network error: ${e.localizedMessage}", isUser = false)
+                )
+            }
+        }
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FAQ.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FAQ().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

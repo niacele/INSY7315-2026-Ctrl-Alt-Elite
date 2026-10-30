@@ -17,7 +17,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Back"
         android:padding="12dp"
-        android:src="@android:drawable/ic_media_previous"
+        android:src="@drawable/ic_back_new"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="#212121" />
